@@ -313,8 +313,8 @@
   /* Cambia esta fecha por tu fecha real de lanzamiento */
   var launch = new Date('2026-01-07T00:00:00');
 
-  function pad(n){ return String(n).padStart(2,'0'); }
-
+ function pad(n){ return String(n).padStart(2,'0'); }
+ 
   function tick(){
     var now  = new Date();
     var diff = launch - now;
@@ -328,19 +328,28 @@
     document.getElementById('mins').textContent  = pad(m);
     document.getElementById('secs').textContent  = pad(s);
   }
-
+ 
   tick();
   setInterval(tick, 1000);
-
-  /* ---- Sign up ---- */
+ 
+  /* ---- Sign up — Tally gDgval ---- */
   function signup(){
     var email = document.getElementById('email').value.trim();
-    if(!email || !email.includes('@')){ 
+    if(!email || !email.includes('@')){
       document.getElementById('email').focus();
-      return; 
+      return;
     }
-    /* Aquí conectarías tu backend o un servicio como Mailchimp / Tally */
+ 
+    fetch('https://api.tally.so/forms/gDgval/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: [{ label: 'Email', value: email }] })
+    }).catch(function(){
+      console.log('Email capturado:', email);
+    });
+ 
     document.getElementById('form').style.display = 'none';
+    document.querySelector('.form-hint').style.display = 'none';
     document.getElementById('success').style.display = 'block';
   }
 </script>
