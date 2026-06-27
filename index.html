@@ -313,8 +313,8 @@
   /* Cambia esta fecha por tu fecha real de lanzamiento */
   var launch = new Date('2026-01-07T00:00:00');
 
- function pad(n){ return String(n).padStart(2,'0'); }
- 
+  function pad(n){ return String(n).padStart(2,'0'); }
+
   function tick(){
     var now  = new Date();
     var diff = launch - now;
@@ -328,31 +328,47 @@
     document.getElementById('mins').textContent  = pad(m);
     document.getElementById('secs').textContent  = pad(s);
   }
- 
+
   tick();
   setInterval(tick, 1000);
- 
-  /* ---- Sign up — Tally gDgval ---- */
-  function signup(){
-    var email = document.getElementById('email').value.trim();
+
+  /* ---- Sign up — tu propio backend ---- */
+  /* Cambia la URL por la de tu servicio en Render */
+  var BACKEND_URL = 'https://TU-APP.onrender.com/api/waitlist';
+
+  async function signup(){
+    var input = document.getElementById('email');
+    var btn   = document.querySelector('.form button');
+    var email = input.value.trim();
+
     if(!email || !email.includes('@')){
-      document.getElementById('email').focus();
+      input.focus();
       return;
     }
- 
-    fetch('https://api.tally.so/forms/gDgval/submissions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: [{ label: 'Email', value: email }] })
-    }).catch(function(){
-      console.log('Email capturado:', email);
-    });
- 
-    document.getElementById('form').style.display = 'none';
-    document.querySelector('.form-hint').style.display = 'none';
-    document.getElementById('success').style.display = 'block';
+
+    btn.disabled = true;
+    var originalText = btn.textContent;
+    btn.textContent = 'Enviando…';
+
+    try {
+      var res = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      });
+
+      if(!res.ok){ throw new Error('Respuesta no OK'); }
+
+      document.getElementById('form').style.display = 'none';
+      document.querySelector('.form-hint').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert('Ups, algo ha fallado. Inténtalo de nuevo en un momento.');
+    }
   }
 </script>
-
 </body>
 </html>
